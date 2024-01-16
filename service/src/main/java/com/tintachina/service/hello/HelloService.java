@@ -10,10 +10,14 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+/**
+ * @author seonghyeon.seo
+ */
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -23,11 +27,15 @@ public class HelloService implements HelloApi {
 
   @Override
   public Mono<Map<String, String>> hello(String name) throws InvalidInputException {
+    if (StringUtils.isEmpty(name)) {
+      throw new NotFoundException("Name is empty");
+    }
+
     if (containsNumber(name)) {
       throw new InvalidInputException("Name contains number");
     }
 
-    Map<String, String> map = Map.of("name", name);
+    Map<String, String> map = Map.of("name", "Hello, " +  name);
     return Mono.just(map);
   }
 
