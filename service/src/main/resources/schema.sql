@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS USERS (
+    user_id SERIAL NOT NULL,
+    nickname VARCHAR(255) NOT NULL,
+    age BIGINT,
+    role VARCHAR(255) NOT NULL,
+    PRIMARY KEY (user_id)
+);
