@@ -1,4 +1,4 @@
-package com.tintachina.config;
+package com.tintachina.service.infra.database;
 
 import io.r2dbc.spi.ConnectionFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,7 +18,7 @@ public class DataSourceR2dbcConfig {
     ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer();
     initializer.setConnectionFactory(connectionFactory);
     ResourceDatabasePopulator resource =
-        new ResourceDatabasePopulator(new ClassPathResource("schema.sql"));
+        new ResourceDatabasePopulator(new ClassPathResource("db/postgres/schema.sql"));
     initializer.setDatabasePopulator(resource);
     return initializer;
   }

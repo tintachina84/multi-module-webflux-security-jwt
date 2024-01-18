@@ -1,4 +1,4 @@
-package com.tintachina.config;
+package com.tintachina.service.infra.openapi;
 
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;

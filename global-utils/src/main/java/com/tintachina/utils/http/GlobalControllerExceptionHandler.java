@@ -6,6 +6,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import com.tintachina.api.exceptions.BadRequestException;
 import com.tintachina.api.exceptions.InvalidInputException;
 import com.tintachina.api.exceptions.NotFoundException;
+import com.tintachina.api.exceptions.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,14 @@ class GlobalControllerExceptionHandler {
   @ExceptionHandler(NotFoundException.class)
   public HttpErrorInfo handleNotFoundExceptions(
       ServerHttpRequest request, NotFoundException ex) {
+
+    return createHttpErrorInfo(NOT_FOUND, request, ex);
+  }
+
+  @ResponseStatus(NOT_FOUND)
+  @ExceptionHandler(UserNotFoundException.class)
+  public HttpErrorInfo handleUserNotFoundExceptions(
+      ServerHttpRequest request, UserNotFoundException ex) {
 
     return createHttpErrorInfo(NOT_FOUND, request, ex);
   }
