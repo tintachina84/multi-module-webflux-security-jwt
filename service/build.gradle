@@ -34,10 +34,9 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0'
 
 	// R2DBC for Postgres
-	implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
+	implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
 	runtimeOnly 'org.postgresql:r2dbc-postgresql:1.0.4.RELEASE'
-	runtimeOnly("io.r2dbc:r2dbc-postgresql")
-	runtimeOnly("org.postgresql:postgresql")
+	runtimeOnly 'org.postgresql:postgresql'
 
 	// Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
