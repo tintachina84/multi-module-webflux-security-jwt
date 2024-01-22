@@ -1,6 +1,9 @@
 package com.tintachina.service.entities.user;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,8 +26,8 @@ public class User {
   private String name;
   private String password;
   private String email;
-  private String role;
-  private String status;
+  private List<String> roles = new ArrayList<>();
+  private boolean active = true;
   @CreatedDate
   private LocalDateTime createdAt;
   @LastModifiedDate

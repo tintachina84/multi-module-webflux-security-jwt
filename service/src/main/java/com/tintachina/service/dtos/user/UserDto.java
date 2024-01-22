@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author seonghyeon.seo
  */
@@ -16,7 +18,7 @@ public class UserDto {
   private String name;
   private String password;
   private String email;
-  private String role;
+  private List<String> roles;
   private String status;
   private String createdAt;
   private String modifiedAt;
