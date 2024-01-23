@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
  */
 public interface UserRepository extends ReactiveCrudRepository<User, Long> {
 
-  Mono<User> findByName(String name);
-  Flux<User> findUsersByNameContainingIgnoreCase(String name);
-  Mono<User> findByEmail(String email);
+  Mono<User> findUserByUsername(String username);
+  Flux<User> findUsersByUsernameContainingIgnoreCase(String username);
+  Mono<User> findUserByEmail(String email);
 }

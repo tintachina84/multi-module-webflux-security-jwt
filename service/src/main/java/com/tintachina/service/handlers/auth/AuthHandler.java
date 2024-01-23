@@ -1,5 +1,7 @@
 package com.tintachina.service.handlers.auth;
 
+import com.tintachina.api.exceptions.NotFoundException;
+import com.tintachina.service.entities.auth.AuthenticationRequest;
 import com.tintachina.service.entities.auth.SignInRequest;
 import com.tintachina.service.entities.user.User;
 import com.tintachina.service.infra.security.jwt.JwtTokenProvider;
@@ -12,8 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
@@ -30,56 +32,38 @@ public class AuthHandler {
     private final @NonNull UserMapper userMapper;
     private final @NonNull JwtTokenProvider tokenProvider;
     private final @NonNull ReactiveAuthenticationManager authenticationManager;
+    private final @NonNull PasswordEncoder passwordEncoder;
 
     public Mono<ServerResponse> signin(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(SignInRequest.class)
-                .flatMap(request -> userRepository.findByEmail(request.getEmail())
-                        .flatMap(user -> ServerResponse.badRequest().bodyValue("User already exists."))
-                        .switchIfEmpty(Mono.defer(() -> userRepository.save(User.builder()
-                                        .name(request.getName())
-                                        .email(request.getEmail())
-                                        .password(request.getPassword())
-                                        .roles(List.of("USER"))
-                                        .build()))
-                                .map(user -> this.userMapper.entityToDto(user))
-                                .flatMap(user -> this.authenticationManager
-                                        .authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()))
-                                        .map(this.tokenProvider::createToken))
-                                .flatMap(jwt -> {
-                                    var tokenBody = Map.of("access_token", jwt);
-                                    return ServerResponse.ok().headers(httpHeaders ->
-                                            httpHeaders.set(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
-                                    ).bodyValue(tokenBody);
-                                })
-                        )
-        );
-    }
-
-    public Mono<ServerResponse> signin2(ServerRequest serverRequest) {
-        return serverRequest.bodyToMono(SignInRequest.class)
-                .flatMap(request -> userRepository.findByEmail(request.getEmail())
-                        .flatMap(user -> ServerResponse.badRequest().bodyValue("User already exists."))
-                        .switchIfEmpty(
-                                Mono.defer(() -> userRepository.save(User.builder()
-                                                .name(request.getName())
-                                                .email(request.getEmail())
-                                                .password(request.getPassword())
-                                                .build()))
-                                        .flatMap(user -> ServerResponse.ok().bodyValue(user))
-                        ));
-    }
-
-    public Mono<ServerResponse> signin3(ServerRequest serverRequest) {
-        return serverRequest.bodyToMono(SignInRequest.class)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("Request body is empty.")))
-                .flatMap(signInRequest -> this.userRepository.findByEmail(signInRequest.getEmail())
+                .flatMap(signInRequest -> this.userRepository.findUserByUsername(signInRequest.getUsername())
+                        .flatMap(user -> Mono.error(new IllegalArgumentException("User already exists.")))
                         .switchIfEmpty(this.userRepository.save(User.builder()
-                                .name(signInRequest.getName())
-                                .email(signInRequest.getEmail())
-                                .password(signInRequest.getPassword())
+                                .username(signInRequest.getUsername())
+                                .email(signInRequest.getUsername())
+                                .password(this.passwordEncoder.encode(signInRequest.getPassword()))
                                 .roles(List.of("USER"))
+                                .active(true)
                                 .build()))
-                        .flatMap(user -> ServerResponse.ok().bodyValue(user))
-                );
+                )
+                .flatMap(user -> ServerResponse.ok().bodyValue(user))
+                .onErrorResume(e -> ServerResponse.status(HttpStatus.BAD_REQUEST).bodyValue(e.getMessage()));
+    }
+
+    public Mono<ServerResponse> login(ServerRequest serverRequest) {
+        return serverRequest.bodyToMono(AuthenticationRequest.class)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Request body is empty.")))
+                .flatMap(request -> this.userRepository.findUserByUsername(request.username())
+                        .switchIfEmpty(Mono.error(new NotFoundException("User doesn't exists.")))
+                        .flatMap(user -> this.authenticationManager.authenticate(
+                                        new UsernamePasswordAuthenticationToken(request.username(), request.password()))
+                                .map(this.tokenProvider::createToken))
+                ).flatMap(jwt -> {
+                    HttpHeaders httpHeaders = new HttpHeaders();
+                    httpHeaders.set(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
+                    var tokenBody = Map.of("access_token", jwt);
+                    return ServerResponse.ok().headers(headers -> headers.addAll(httpHeaders)).bodyValue(tokenBody);
+                });
     }
 }

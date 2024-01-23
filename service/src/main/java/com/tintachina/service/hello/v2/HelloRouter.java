@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.RouterOperation;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +24,7 @@ public class HelloRouter {
 
   @Bean
   @RouterOperation(operation = @Operation(operationId = "sayHello", summary = "Get name and say hello.", tags = { "SayHello" },
+      security = { @SecurityRequirement(name = "Bearer Authentication") },
       parameters = { @Parameter(in = ParameterIn.PATH, name = "name", description = "Say Hello") },
       responses = { @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = String.class))),
           @ApiResponse(responseCode = "400", description = "Invalid Name supplied"),

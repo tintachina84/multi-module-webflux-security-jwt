@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS USERS CASCADE;
 
 CREATE TABLE IF NOT EXISTS USERS (
     id SERIAL NOT NULL,
-    name VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     roles VARCHAR(255) NOT NULL,
@@ -12,11 +12,11 @@ CREATE TABLE IF NOT EXISTS USERS (
     PRIMARY KEY (id)
 );
 
-INSERT INTO USERS (name, password, email, roles, active)
-VALUES ('John Doe', 'johnspassword', 'john@doe.com', 'Admin,User', true);
+INSERT INTO USERS (username, password, email, roles, active)
+VALUES ('john@doe.com', 'johnspassword', 'john@doe.com', 'Admin,User', true);
 
-INSERT INTO USERS (name, password, email, roles, active)
-VALUES ('Jane Smith', 'janespassword', 'jane@smith.com', 'User', true);
+INSERT INTO USERS (username, password, email, roles, active)
+VALUES ('jane@smith.com', 'janespassword', 'jane@smith.com', 'User', true);
 
-INSERT INTO USERS (name, password, email, roles, active)
-VALUES ('Alice Johnson', 'alicespassword', 'alice@johnson.com', 'User', false);
+INSERT INTO USERS (username, password, email, roles, active)
+VALUES ('alice@johnson.com', 'alicespassword', 'alice@johnson.com', 'User', false);

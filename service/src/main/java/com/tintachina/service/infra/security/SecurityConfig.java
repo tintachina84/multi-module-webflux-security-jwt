@@ -44,9 +44,9 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(HttpMethod.OPTIONS).permitAll()
                         .pathMatchers(PERMITTED_PATTERNS).permitAll()
-                        .anyExchange().permitAll()
-                );
-//                .addFilterAt(new JwtTokenAuthenticationFilter(tokenProvider), SecurityWebFiltersOrder.HTTP_BASIC);
+                        .anyExchange().authenticated()
+                )
+                .addFilterAt(new JwtTokenAuthenticationFilter(tokenProvider), SecurityWebFiltersOrder.HTTP_BASIC);
 
         return http.build();
     }
@@ -58,9 +58,9 @@ public class SecurityConfig {
 
     @Bean
     public ReactiveUserDetailsService userDetailsService(UserRepository users) {
-        return email -> users.findByEmail(email)
+        return username -> users.findUserByUsername(username)
                 .map(u -> User
-                        .withUsername(u.getEmail())
+                        .withUsername(u.getUsername())
                         .password(u.getPassword())
                         .authorities(u.getRoles().toArray(new String[0]))
                         .accountExpired(!u.isActive())

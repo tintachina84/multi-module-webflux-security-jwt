@@ -29,7 +29,7 @@ public class UserHandler {
   }
 
   public Mono<ServerResponse> findUsersByNameLike(ServerRequest request) {
-    return this.userRepository.findUsersByNameContainingIgnoreCase(request.pathVariable("name"))
+    return this.userRepository.findUsersByUsernameContainingIgnoreCase(request.pathVariable("name"))
         .map(userMapper::entityToDto)
         .collectList()
         .flatMap(userDtos -> ServerResponse.ok().bodyValue(userDtos))
@@ -37,7 +37,7 @@ public class UserHandler {
   }
 
   private Mono<User> findVerifiedUserByName(String name) {
-    return userRepository.findByName(name)
+    return userRepository.findUserByUsername(name)
         .switchIfEmpty(Mono.error(new UserNotFoundException(name)));
   }
 }
